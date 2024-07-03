@@ -70,7 +70,7 @@ pip install -e /misc/student/srinivap/git_repo/od3d
 rm "/misc/student/srinivap/git_repo/od3d/installing.txt"
 
 DATASET=SPair
-python3 train.py --config configs/dataset/${DATASET}.yaml
+python3 train_sph.py --config configs/dataset/${DATASET}.yaml
 
 
 #PYTHONUNBUFFERED=1
