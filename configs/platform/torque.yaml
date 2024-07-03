@@ -1,0 +1,22 @@
+link: torque
+shared_home_with_local: False
+path_od3d: /misc/student/srinivap/git_repo/od3d
+pull_od3d: True
+pull_od3d_submodules: True
+install_od3d: True
+#path_datasets: /misc/lmbraid19/sommerl/datasets
+#path_exps: /misc/lmbraid19/sommerl/exps
+path_datasets_raw: /misc/lmbraid19/sommerl/datasets #/misc/student/srinivap/datasets_preprocess # /misc/lmbraid19/sommerl/datasets # /misc/student/srinivap/datasets_preprocess #/misc/lmbraid19/sommerl/datasets
+path_datasets_preprocess: /misc/student/srinivap/datasets_preprocess
+path_exps: /misc/lmbraid21/jesslen/Premnath/exps
+path_cuda: /misc/software/cuda/cuda-11.7
+path_home: /home/srinivap
+url_od3d: git@github.com:Generative-Vision-Robust-Learning/od3d.git
+username: srinivap
+queue: student # default-cpu, student
+gpu_count: 1
+gpu_mem_in_gb: 
+cpu_count: 4
+ram: "20gb"
+walltime: "24:00:00"
+hostlist: "^shuri"
