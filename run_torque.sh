@@ -1,7 +1,7 @@
 #!/bin/bash
-#PBS -N 06-19_21-50-42_Pascal3D_NeMo_Dinov2_with_head_norm_without_class_contrastive_loss_gradient_sh_torque
+#PBS -N Spherical_maps_Spair
 #PBS -S /bin/bash
-#PBS -l hostlist=^shuri,nodes=1:ppn=4:gpus=1,mem=20gb,walltime=24:00:00
+#PBS -l hostlist=^shuri,nodes=1:ppn=16:gpus=1,mem=20gb,walltime=24:00:00
 #PBS -q student
 #PBS -m a
 #PBS -M srinivap@informatik.uni-freiburg.de
