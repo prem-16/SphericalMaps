@@ -181,7 +181,7 @@ class Animal3DDataset(torch.utils.data.Dataset):
         image_shape = image.size
         assert image_shape == (annotation['width'], annotation['height'])
 
-        
+        vp = self._getviewpoint(annotation['pose'][:3])
 
        # src_kps = torch.from_numpy(np.array(src_kps)).flip(-1)
        # trg_kps = torch.from_numpy(np.array(trg_kps)).flip(-1)
@@ -205,9 +205,18 @@ class Animal3DDataset(torch.utils.data.Dataset):
                 image = self.normalize(image)
             mask = self.to_tensor(mask)
             mask = self.resize(mask)
-            return {'img': image, 'mask': mask, 'idx': idx, 'vp': 0, 'cat': category , 'super_cat': super_category , 'kps': kps}
+            return {'img': image, 'mask': mask, 'idx': idx, 'vp': vp, 'cat': category , 'super_cat': super_category , 'kps': kps}
 
-    
+    def _getviewpoint(self, axis_angle ,n_bins=8):
+        x = torch.tensor(axis_angle[0])
+        y = torch.tensor(axis_angle[1])
+        azimuth = torch.arctan2(y, x)
+        if azimuth < 0:
+            azimuth += 2 * np.pi
+        azimuth = azimuth * 180 / np.pi
+        bin_size = 360 / n_bins
+        azimuth_bin = torch.round(azimuth / bin_size)
+        return azimuth_bin
 
 if __name__ == '__main__':
     with open("configs/dataset/Animal3D.yaml") as config_file:
@@ -217,7 +226,12 @@ if __name__ == '__main__':
     train_dataset = dataset(path=cfg['data']['data_path'], resize_im=False, imsize=cfg['data']['im_size'], n_bins=cfg['data']['vp_bins'], training_batch=True, split='train')
     train_dataloader = torch.utils.data.DataLoader(train_dataset, batch_size=2, num_workers=1, drop_last=False, shuffle=True,)
     for i, sample in enumerate(train_dataloader):
-        if i == 1:
+        print(f"img : {sample['img'].shape}")
+        print(f"mask : {sample['mask'].shape}")
+        print(f"idx : {sample['idx']}")
+        print(f"vp : {sample['vp']}")
+  
+        if i <= 10:
             image_numpy = sample['img'][0].permute(1,2,0).numpy()
             image_numpy = np.ascontiguousarray(image_numpy)
             mask_numpy = sample['mask'][0].permute(1,2,0).numpy()
@@ -226,17 +240,14 @@ if __name__ == '__main__':
                 if kps[2] == 0:
                     continue
                 kps = kps.numpy()
-                print(kps)
+
                 cv.circle(image_numpy, (kps[0], kps[1]), 5, (0,255,0), -1)
 
             cv.imshow('mask', mask_numpy)
             cv.imshow('img', image_numpy)
             cv.waitKey(0)
             cv.destroyAllWindows()
-            break
-        print(f"kps : {sample['kps'].shape}")
-        print(f"img : {sample['img'].shape}")
-        print(f"mask : {sample['mask'].shape}")
-        print(f"idx : {sample['idx']}")
-        print(f"vp : {sample['vp']}")
-  
+            if i == 10:
+                break
+        #print(f"kps : {sample['kps'].shape}")
+        

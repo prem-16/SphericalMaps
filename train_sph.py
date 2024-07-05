@@ -14,6 +14,7 @@ from tqdm import tqdm
 
 from datasets.FCars import FreiburgCarsDataset
 from datasets.SPair import SPairDataset
+from datasets.Animal3D import Animal3DDataset
 
 from dino_mapper import (
     DINOMapper,
@@ -117,6 +118,8 @@ def train(cfg):
         TrainSet = SPairDataset
     elif cfg['data']['set'] == 'FCars':
         TrainSet = FreiburgCarsDataset
+    elif cfg['data']['set'] == 'Animal3D':
+        TrainSet = Animal3DDataset
     train_dataset = TrainSet(path=cfg['data']['data_path'], resize_im=True, imsize=cfg['data']['im_size'], n_bins=cfg['data']['vp_bins'], training_batch=True, replications=10)
     train_dataloader = torch.utils.data.DataLoader(train_dataset, batch_size=batch_size, num_workers=16, drop_last=False, shuffle=True, worker_init_fn=seed_worker, generator=g,)
 
