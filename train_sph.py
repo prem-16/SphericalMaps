@@ -113,7 +113,7 @@ def train(cfg):
 
     epochs = cfg['training']['epochs']
     batch_size = cfg['training']['batch_size']
-    assert cfg['data']['set'] in ['SPair', 'FCars'], f"""{cfg['data']['set']} is not a valid training set"""
+    assert cfg['data']['set'] in ['SPair', 'FCars' , 'Animal3D'], f"""{cfg['data']['set']} is not a valid training set"""
     if cfg['data']['set'] == 'SPair':
         TrainSet = SPairDataset
     elif cfg['data']['set'] == 'FCars':
