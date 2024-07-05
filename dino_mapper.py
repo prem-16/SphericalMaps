@@ -355,7 +355,7 @@ def triplet_orientation_loss(sph, fm_shape, correct_sine=True, n_triplets=128, t
         return corrected_dp
 
     def compute_triplets_single_sph(sph, coords, n_triplets):
-        mask = sph.norm(dim=-1, keepdim=True)>.99
+        mask = sph.norm(dim=-1, keepdim=True)>.99 # normalize the sph map to get mask
         valid_points = sph.masked_select(mask).view(-1,3)
         valid_coords = coords.masked_select(mask).view(-1,1)
         n_valid_points = valid_points.size(0)
@@ -439,8 +439,8 @@ def triplet_orientation_loss(sph, fm_shape, correct_sine=True, n_triplets=128, t
 
 def relative_viewpoint_loss(sph, vp, n_bins=8):
 
-    avg_map = F.normalize(sph.mean(dim=1), dim=-1)
-    corr = (avg_map.unsqueeze(1) * avg_map.unsqueeze(0)).sum(-1)
+    avg_map = F.normalize(sph.mean(dim=1), dim=-1) # mean of view points
+    corr = (avg_map.unsqueeze(1) * avg_map.unsqueeze(0)).sum(-1) # corr between images in the batches
     with torch.no_grad():
         #fix that
         bin_size =  2 * np.pi / n_bins 
