@@ -178,6 +178,7 @@ class Animal3DDataset(torch.utils.data.Dataset):
         kps = kps.to(torch.int64)
 
         mask = Image.open(mask_path).convert('L')
+        mask = self.to_tensor(mask)
         image= Image.open(img_path).convert('RGB')
         image_shape = image.size
         assert image_shape == (annotation['width'], annotation['height'])
@@ -199,12 +200,20 @@ class Animal3DDataset(torch.utils.data.Dataset):
                 mask = transforms.functional.crop(mask, top, left, height, width)
             image = self.to_tensor(image)
             if self.resize_im:
-                image = self.geom_augment(image)
+                """
+                src_im = self.to_tensor(src_im)
+                combined = torch.cat([src_im, src_mask], dim=0)
+                aug_combined = self.geom_augment(combined)
+                src_im, src_mask = aug_combined[:3], aug_combined[3:]
+                src_im = self.normalize(src_im)
+                """
+                image = self.to_tensor(image)
+                combined = torch.cat([image, mask], dim=0)
+                aug_combined = self.geom_augment(combined)
+                image, mask = aug_combined[:3], aug_combined[3:]
                 image = self.normalize(image)
-            else:
-                image = self.resize(image)
-                image = self.normalize(image)
-            mask = self.to_tensor(mask)
+            
+            transforms.functional.to_tensor(mask)
             mask = self.resize(mask)
             return {'img': image, 'mask': mask, 'idx': idx, 'vp': vp, 'cat': category , 'super_cat': super_category , 'kps': kps}
 
