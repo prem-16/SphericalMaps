@@ -115,6 +115,7 @@ class Animal3DDataset(torch.utils.data.Dataset):
                     imsize=(224,224),
                     bbox_crop=False, 
                     training_batch=False, 
+                    replications=1,
                     **kwargs):
         self.path = path
         self.split = split
