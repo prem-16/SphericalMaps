@@ -146,7 +146,7 @@ class Animal3DDataset(torch.utils.data.Dataset):
 
 
             
-        self.geom_augment = transforms.RandomResizedCrop(imsize, scale=(.5,1.5), interpolation=Image.BICUBIC, antialias=True)
+        self.geom_augment = transforms.RandomResizedCrop(imsize, scale=(.5,1.5), interpolation=Image.BICUBIC, antialias=True) 
         self.color_jittering = transforms.Compose(
             [
                 transforms.RandomApply(
@@ -198,7 +198,6 @@ class Animal3DDataset(torch.utils.data.Dataset):
                 height = bbx[3] - bbx[1]
                 image = transforms.functional.crop(image, top, left, height, width)
                 mask = transforms.functional.crop(mask, top, left, height, width)
-            image = self.to_tensor(image)
             if self.resize_im:
                 """
                 src_im = self.to_tensor(src_im)
@@ -209,12 +208,11 @@ class Animal3DDataset(torch.utils.data.Dataset):
                 """
                 image = self.to_tensor(image)
                 combined = torch.cat([image, mask], dim=0)
-                aug_combined = self.geom_augment(combined)
+               # aug_combined = self.geom_augment(combined)
+                aug_combined = self.resize(combined)
                 image, mask = aug_combined[:3], aug_combined[3:]
                 image = self.normalize(image)
             
-            transforms.functional.to_tensor(mask)
-            mask = self.resize(mask)
             return {'img': image, 'mask': mask, 'idx': idx, 'vp': vp, 'cat': category , 'super_cat': super_category , 'kps': kps}
 
     def _getviewpoint(self, axis_angle ,n_bins=8):
@@ -233,7 +231,7 @@ if __name__ == '__main__':
         cfg = yaml.safe_load(config_file)
     path = 'datasets/animal3d'
     dataset = Animal3DDataset
-    train_dataset = dataset(path=cfg['data']['data_path'], resize_im=False, imsize=cfg['data']['im_size'], n_bins=cfg['data']['vp_bins'], training_batch=True, split='train')
+    train_dataset = dataset(path=cfg['data']['data_path'], resize_im=True, imsize=cfg['data']['im_size'], n_bins=cfg['data']['vp_bins'], training_batch=True, split='train')
     train_dataloader = torch.utils.data.DataLoader(train_dataset, batch_size=2, num_workers=1, drop_last=False, shuffle=True,)
     for i, sample in enumerate(train_dataloader):
         print(f"img : {sample['img'].shape}")
