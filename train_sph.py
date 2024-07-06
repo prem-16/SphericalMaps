@@ -15,7 +15,7 @@ from tqdm import tqdm
 from datasets.FCars import FreiburgCarsDataset
 from datasets.SPair import SPairDataset
 from datasets.Animal3D import Animal3DDataset
-
+import wandb
 from dino_mapper import (
     DINOMapper,
     triplet_distance_loss, 
@@ -81,7 +81,12 @@ def train_epoch(epoch, data, model, optim, cfg):
         viewpoint_epoch = (viewpoint_epoch * it + vp_loss.cpu().detach().item()) / (it + 1)
 
         pbar_batch.set_description(f"e: {epoch},r: {rec_epoch:.3f}, o: {orientation_epoch:.3f}, d: {distance_epoch:.3f}, v: {viewpoint_epoch:.3f}")
-
+        wandb.log({'reconstruction_loss': sph_loss.cpu().detach().item(),
+                   'orientation_loss': o_loss.cpu().detach().item(),
+                   'distance_loss': rd_loss.cpu().detach().item(),
+                   'viewpoint_loss': vp_loss.cpu().detach().item(),
+                   'epoch': epoch,
+                   'batch': it})
 
     with open(exp_dir+'/logs/log.txt', 'a') as log:
         log.write(f"epoch: {epoch}, reconstruction_loss: {rec_epoch:.3f}, orientation_loss: {orientation_epoch:.3f}, distance_loss: {distance_epoch:.3f}, viewpoint_loss: {viewpoint_epoch:.3f}\n")
@@ -154,6 +159,7 @@ def init_exps_dirs(path):
     os.makedirs(exp_dir+'/logs')
     os.makedirs(exp_dir+'/plots/train')
     os.makedirs(exp_dir+'/ckpts')
+    os.makedirs(exp_dir + '/wandb_logs')
     return exp_dir
 
 
@@ -184,8 +190,17 @@ if __name__ == '__main__':
         device = torch.device('cpu')
 
     global exp_dir
+    
     if cfg['logs']['enabled']:
         exp_dir = init_exps_dirs(cfg['logs']['base_dir'])
         shutil.copy(args.config, exp_dir+'/conf.yml')
-
+    if cfg['logs']['wandb']:
+        wandb.login()
+        wandb.init(
+                project="Spherical_maps",
+                config=cfg,
+                dir=os.path.join(exp_dir,"wandb_logs"),
+                name=f"{cfg['data']['set']}_{cfg['model']['backbone']}_{cfg['training']['learning_rate']}_{cfg['training']['batch_size']}_{cfg['training']['epochs']}",
+                reinit=True,
+            )
     train(cfg)
