@@ -10,6 +10,7 @@ from tqdm import tqdm
 import torch.nn.functional as F
 import json
 from glob import glob
+from datasets.Animal3D import MAP_ANIMAL3D_WNID, ANIMAL3D_SUBCATEGORY
 from utils.utils_correspondence import pairwise_sim, draw_correspondences_gathered, chunk_cosine_sim, co_pca, resize, resize_square, find_nearest_patchs, find_nearest_patchs_replace, draw_correspondences_lines
 import matplotlib.pyplot as plt
 import sys
@@ -19,7 +20,7 @@ from loguru import logger
 import argparse
 from extractor_dino import ViTExtractor
 from extractor_sd import load_model, process_features_and_mask, get_mask
-
+import itertools
 sys.path.append('../corresp')
 from dino_mapper import DINOMapper
 
@@ -120,6 +121,82 @@ def load_spair_data(path, size=256, category='cat', split='test', subsample=None
         trg_kps_dict = trg_ann['kps']
         trg_kp_ixs = torch.tensor([int(kp_id) for kp_id, kp in trg_kps_dict.items() if kp is not None]).view(-1, 1).repeat(1, 3)
         trg_kps = [kp for kp in trg_kps_dict.values() if kp is not None]
+        target_raw_kps = torch.cat([torch.tensor(trg_kps, dtype=torch.float), torch.ones(trg_kp_ixs.size(0), 1)], 1)
+        target_kps = blank_kps.scatter(dim=0, index=trg_kp_ixs, src=target_raw_kps)
+        target_kps, trg_x, trg_y, trg_scale = preprocess_kps_pad(target_kps, target_size[0], target_size[1], size)
+
+        thresholds.append(max(target_bbox[3] - target_bbox[1], target_bbox[2] - target_bbox[0])*trg_scale)
+
+        kps.append(source_kps)
+        kps.append(target_kps)
+        files.append(source_fn)
+        files.append(target_fn)
+
+    kps = torch.stack(kps)
+    used_kps, = torch.where(kps[:, :, 2].any(dim=0))
+    kps = kps[:, used_kps, :]
+    logger.info(f'Final number of used key points: {kps.size(1)}')
+    return files, kps, thresholds
+
+def load_animal3d_data(path, size=256, category='cat', split='test', subsample=None):
+    np.random.seed(SEED)
+    def generate_pairs(category = "japanese_spaniel",annot_data = None):
+        category_wnid = MAP_ANIMAL3D_WNID[category]
+        data_filtered_ids = [x[0] for x in enumerate(annot_data['data']) if x[1]['category'] == annot_data['categories'].index(category_wnid)]
+        return list(itertools.permutations(data_filtered_ids,2))
+    annot_path = os.path.join(path, f"test.json")
+    with open(annot_path, "r") as read_file:
+        annot_data = json.load(read_file)
+    pairs = generate_pairs(category,annot_data)
+    
+    if subsample is not None and subsample > 0:
+        pairs = [pairs[ix] for ix in np.random.choice(len(pairs), subsample)]
+    logger.info(f'Number of SPairs for {category} = {len(pairs)}')
+    files = []
+    thresholds = []
+    #category_anno = list(glob(f'{path}/ImageAnnotation/{category}/*.json'))[0]
+    # with open(category_anno) as f:
+    #     num_kps = len(json.load(f)['kps'])
+    num_kps = len(annot_data['data'][0]['keypoints_2d'])
+    logger.info(f'Number of SPair key points for {category} <= {num_kps}')
+    kps = []
+    blank_kps = torch.zeros(num_kps, 3)
+    for pair in pairs:
+     
+        src_data = annot_data['data'][pair[0]]
+        target_data = annot_data['data'][pair[1]]
+        category_idx = annot_data['categories'].index(MAP_ANIMAL3D_WNID[category])
+        assert category_idx == src_data['category']
+        assert category_idx == target_data['category']
+        
+        source_fn = f'{path}/{src_data['img_path']}'
+        target_fn = f'{path}/{target_data['img_path']}'
+        source_bbox = np.asarray(src_data['bbox'])
+        target_bbox = np.asarray(target_data['bbox'])
+
+
+        # The source thresholds aren't actually used to evaluate PCK on SPair-71K, but for completeness
+        # they are computed as well:
+        # thresholds.append(max(source_bbox[3] - source_bbox[1], source_bbox[2] - source_bbox[0]))
+        # thresholds.append(max(target_bbox[3] - target_bbox[1], target_bbox[2] - target_bbox[0]))
+
+        source_size = src_data['width'] , src_data['height']  # (W, H)
+        target_size = target_data['width'], target_data['height']  # (W, H)
+
+       
+        
+        
+        src_kp_ixs = torch.tensor([kp_id for kp_id, kp in enumerate(src_data['keypoint_2d']) if kp is not None]).view(-1, 1).repeat(1, 3)
+        src_kps =  [kp for kp in src_data['keypoint_2d'] if kp is not None]
+        source_raw_kps = torch.cat([torch.tensor(src_kps, dtype=torch.float), torch.ones(src_kp_ixs.size(0), 1)], 1)
+        source_kps = blank_kps.scatter(dim=0, index=src_kp_ixs, src=source_raw_kps)
+        source_kps, src_x, src_y, src_scale = preprocess_kps_pad(source_kps, source_size[0], source_size[1], size)
+        
+       
+        
+        
+        trg_kp_ixs = torch.tensor([int(kp_id) for kp_id, kp in enumerate(target_data['keypoint_2d']) if kp is not None]).view(-1, 1).repeat(1, 3)
+        trg_kps = [kp for kp in target_data['keypoint_2d'] if kp is not None]
         target_raw_kps = torch.cat([torch.tensor(trg_kps, dtype=torch.float), torch.ones(trg_kp_ixs.size(0), 1)], 1)
         target_kps = blank_kps.scatter(dim=0, index=trg_kp_ixs, src=target_raw_kps)
         target_kps, trg_x, trg_y, trg_scale = preprocess_kps_pad(target_kps, target_size[0], target_size[1], size)
@@ -591,6 +668,7 @@ def main(args):
     SEED = args.SEED
     WEIGHT = args.WEIGHT # corresponde to three groups for the sd features, and one group for the dino features
     PASCAL = args.PASCAL
+    ANIMAL3D = args.ANIMAL3D
     RAW = args.RAW
 
     DATA_PATH = args.DATA_PATH
@@ -611,6 +689,8 @@ def main(args):
     if args.DIST != "cos" and args.DIST != "l2":
         DIST = args.DIST
     if PASCAL:
+        SAMPLE = 0
+    if ANIMAL3D:
         SAMPLE = 0
 
     np.random.seed(args.SEED)
@@ -642,10 +722,13 @@ def main(args):
 
     logger.info(args)
     data_dir = 'SPair-71k' if not PASCAL else 'PF-dataset-PASCAL'
+    data_dir = 'ANIMAL3D' if ANIMAL3D else data_dir
     data_dir = os.path.join(DATA_PATH, data_dir)
-    if not PASCAL:
+    if not PASCAL and not ANIMAL3D:
         categories = os.listdir(os.path.join(data_dir, 'ImageAnnotation'))
         categories = sorted(categories)
+    elif ANIMAL3D:
+        categories = list(MAP_ANIMAL3D_WNID.keys())
     else:
         categories = ['aeroplane', 'bicycle', 'bird', 'boat', 'bottle',
                     'bus', 'car', 'cat', 'chair', 'cow',
@@ -669,7 +752,12 @@ def main(args):
     pcks_01 = []
     start_time=time.time()
     for cat in categories:
-        files, kps, thresholds = load_spair_data(data_dir, size=img_size, category=cat, subsample=SAMPLE) if not PASCAL else load_pascal_data(data_dir, size=img_size, category=cat, subsample=SAMPLE)
+        if not PASCAL and not ANIMAL3D:
+            files, kps, thresholds = load_spair_data(data_dir, size=img_size, category=cat, subsample=SAMPLE)
+        elif ANIMAL3D:
+            files, kps, thresholds = load_animal3d_data(data_dir, size=img_size, category=cat, subsample=SAMPLE)
+        else:
+            load_pascal_data(data_dir, size=img_size, category=cat, subsample=SAMPLE) 
         if BBOX_THRE:
             pck = compute_score(model, extractor, aug, save_path, files, kps, cat, mask=MASK, dist=DIST, thresholds=thresholds, real_size=SIZE, metric=metric)
         else:
