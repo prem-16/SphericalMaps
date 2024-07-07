@@ -21,7 +21,7 @@ MAP_ANIMAL3D_WNID = {
     "weimaraner": "n02092339",
     "cairn": "n02096177",
     "boston_bull": "n02096585",
-    "tibetan_terrier": "n02097474",
+   # "tibetan_terrier": "n02097474", keypoints out of index
     "soft-coated_wheaten_terrier": "n02098105",
     "golden_retriever": "n02099601",
     "english_setter": "n02100583",
