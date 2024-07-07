@@ -800,7 +800,7 @@ if __name__ == '__main__':
     parser.add_argument('--EDGE_PAD', action='store_true', default=False)           # set true to pad the image with the edge pixels
     parser.add_argument('--WEIGHT', nargs=5, type=float, default=[1,1,1,1,1])       # first three corresponde to three layers for the sd features, and the last two for the ensembled sd/dino features
     parser.add_argument('--RAW', action='store_true', default=False)                # set true to use the raw features from sd
-
+    parser.add_argument('--ANIMAL3D', action='store_true',default=False)
     parser.add_argument('--NOT_FUSE', action='store_true', default=False)           # set true to use only sd features
     parser.add_argument('--ONLY_DINO', action='store_true', default=False)          # set true to use only dino features
     parser.add_argument('--DINOV1',  action='store_true', default=False)            # set true to use dinov1
