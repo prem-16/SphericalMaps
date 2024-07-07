@@ -311,6 +311,7 @@ def compute_score(model, extractor, aug, save_path, files, kps, category, mask=F
     for pair_idx in range(N):
         # Load image 1
         img1 = Image.open(files[2*pair_idx]).convert('RGB')
+        print(files[2*pair_idx])
         img1_input = resize(img1, real_size, resize=True, to_pil=True, edge=EDGE_PAD)
         img1 = resize(img1, img_size, resize=True, to_pil=True, edge=EDGE_PAD)
         img1_kps = kps[2*pair_idx]
