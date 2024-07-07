@@ -741,7 +741,8 @@ def main(args):
         global sph_mapper
         device = 'cuda' if torch.cuda.is_available() else 'cpu'
         ckpt_path = args.SPH_CKPT_PATH
-        sph_mapper = DINOMapper(n_cats=18)
+        n_cats = 40 if ANIMAL3D else 18
+        sph_mapper = DINOMapper(n_cats=n_cats)
         sph_mapper.load_checkpoint(ckpt_path, device=device)
         sph_mapper = sph_mapper.to(device)
 
