@@ -294,7 +294,8 @@ def compute_score(model, extractor, aug, save_path, files, kps, category, mask=F
     # extractor = ViTExtractor(model_type, stride, device=device)
     patch_size = extractor.model.patch_embed.patch_size[0] if DINOV2 else extractor.model.patch_embed.patch_size
     num_patches = int(patch_size / stride * (img_size // patch_size - 1) + 1)
-    
+    print(f"patch size:{patch_size}")
+    print(f"num_patches:{num_patches}")
     input_text = "a photo of "+category if TEXT_INPUT else None
 
     current_save_results = 0
@@ -319,7 +320,7 @@ def compute_score(model, extractor, aug, save_path, files, kps, category, mask=F
         img1_y_patch = (num_patches / img_size * img1_y).astype(np.int32)
         img1_x_patch = (num_patches / img_size * img1_x).astype(np.int32)
         img1_patch_idx = num_patches * img1_y_patch + img1_x_patch
-
+        print(img1_kps)
         # Load image 2
         img2 = Image.open(files[2*pair_idx+1]).convert('RGB')
         img2_input = resize(img2, real_size, resize=True, to_pil=True, edge=EDGE_PAD)
