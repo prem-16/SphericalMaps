@@ -157,7 +157,7 @@ def load_animal3d_data(path, size=256, category='cat', split='test', subsample=N
     #category_anno = list(glob(f'{path}/ImageAnnotation/{category}/*.json'))[0]
     # with open(category_anno) as f:
     #     num_kps = len(json.load(f)['kps'])
-    num_kps = len(annot_data['data'][0]['keypoints_2d'])
+    num_kps = len(annot_data['data'][0]['keypoint_2d'])
     logger.info(f'Number of SPair key points for {category} <= {num_kps}')
     kps = []
     blank_kps = torch.zeros(num_kps, 3)
