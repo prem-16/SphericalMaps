@@ -722,7 +722,7 @@ def main(args):
 
     logger.info(args)
     data_dir = 'SPair-71k' if not PASCAL else 'PF-dataset-PASCAL'
-    data_dir = 'ANIMAL3D' if ANIMAL3D else data_dir
+    data_dir = 'animal3d' if ANIMAL3D else data_dir
     data_dir = os.path.join(DATA_PATH, data_dir)
     if not PASCAL and not ANIMAL3D:
         categories = os.listdir(os.path.join(data_dir, 'ImageAnnotation'))
