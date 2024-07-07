@@ -215,7 +215,7 @@ class Animal3DDataset(torch.utils.data.Dataset):
             
             return {'img': image, 'mask': mask, 'idx': idx, 'vp': vp, 'cat': category , 'super_cat': super_category , 'kps': kps}
 
-    def _getviewpoint(self, axis_angle ,n_bins=8):
+    def _getviewpoint(self, axis_angle ,n_bins=360):
         x = torch.tensor(axis_angle[0])
         y = torch.tensor(axis_angle[1])
         azimuth = torch.arctan2(y, x)
