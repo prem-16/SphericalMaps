@@ -42,7 +42,7 @@ MAP_ANIMAL3D_WNID = {
     "american_black_bear": "n02133161",
     "ice_bear": "n02134084",
     "sloth_bear": "n02134418",
-    "hippopotamus": "n02389026",
+    #"horse": "n02389026",
     "zebra": "n02391049",
     "wild_boar": "n02397096",
     "yak": "n02403003",

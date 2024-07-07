@@ -294,8 +294,8 @@ def compute_score(model, extractor, aug, save_path, files, kps, category, mask=F
     # extractor = ViTExtractor(model_type, stride, device=device)
     patch_size = extractor.model.patch_embed.patch_size[0] if DINOV2 else extractor.model.patch_embed.patch_size
     num_patches = int(patch_size / stride * (img_size // patch_size - 1) + 1)
-    print(f"patch size:{patch_size}")
-    print(f"num_patches:{num_patches}")
+    #print(f"patch size:{patch_size}")
+    #print(f"num_patches:{num_patches}")
     input_text = "a photo of "+category if TEXT_INPUT else None
 
     current_save_results = 0
@@ -311,7 +311,7 @@ def compute_score(model, extractor, aug, save_path, files, kps, category, mask=F
     for pair_idx in range(N):
         # Load image 1
         img1 = Image.open(files[2*pair_idx]).convert('RGB')
-        print(files[2*pair_idx])
+        #print(files[2*pair_idx])
         img1_input = resize(img1, real_size, resize=True, to_pil=True, edge=EDGE_PAD)
         img1 = resize(img1, img_size, resize=True, to_pil=True, edge=EDGE_PAD)
         img1_kps = kps[2*pair_idx]
@@ -321,7 +321,7 @@ def compute_score(model, extractor, aug, save_path, files, kps, category, mask=F
         img1_y_patch = (num_patches / img_size * img1_y).astype(np.int32)
         img1_x_patch = (num_patches / img_size * img1_x).astype(np.int32)
         img1_patch_idx = num_patches * img1_y_patch + img1_x_patch
-        print(img1_kps)
+        #print(img1_kps)
         # Load image 2
         img2 = Image.open(files[2*pair_idx+1]).convert('RGB')
         img2_input = resize(img2, real_size, resize=True, to_pil=True, edge=EDGE_PAD)
@@ -493,8 +493,8 @@ def compute_score(model, extractor, aug, save_path, files, kps, category, mask=F
             vis = torch.ones_like(vis)
         # Get similarity matrix
         if dist == 'cos':
-            print(f'img1 desc shape:{img1_desc.shape}')
-            print(f'img1_patch_idx:{img1_patch_idx}')
+           # print(f'img1 desc shape:{img1_desc.shape}')
+           # print(f'img1_patch_idx:{img1_patch_idx}')
             sim_1_to_2 = chunk_cosine_sim(img1_desc[:,:,img1_patch_idx], img2_desc).squeeze()
         elif dist == 'l2':
             sim_1_to_2 = pairwise_sim(img1_desc[:,:,img1_patch_idx], img2_desc, p=2).squeeze()
