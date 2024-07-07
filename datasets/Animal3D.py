@@ -17,7 +17,7 @@ MAP_ANIMAL3D_WNID = {
     "japanese_spaniel": "n02085782",
     "walker_hound": "n02089867",
     "redbone": "n02090379",
-    "saluki": "n02091831",
+   # "saluki": "n02091831", keypoints out of index
     "weimaraner": "n02092339",
     "cairn": "n02096177",
     "boston_bull": "n02096585",
