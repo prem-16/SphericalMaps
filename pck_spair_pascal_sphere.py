@@ -492,7 +492,7 @@ def compute_score(model, extractor, aug, save_path, files, kps, category, mask=F
         # Get similarity matrix
         if dist == 'cos':
             print(f'img1 desc shape:{img1_desc.shape}')
-            print(f'img1_patch_idx')
+            print(f'img1_patch_idx:{img1_patch_idx}')
             sim_1_to_2 = chunk_cosine_sim(img1_desc[:,:,img1_patch_idx], img2_desc).squeeze()
         elif dist == 'l2':
             sim_1_to_2 = pairwise_sim(img1_desc[:,:,img1_patch_idx], img2_desc, p=2).squeeze()
