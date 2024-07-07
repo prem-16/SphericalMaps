@@ -169,8 +169,8 @@ def load_animal3d_data(path, size=256, category='cat', split='test', subsample=N
         assert category_idx == src_data['category']
         assert category_idx == target_data['category']
         
-        source_fn = f'{path}/{src_data['img_path']}'
-        target_fn = f'{path}/{target_data['img_path']}'
+        source_fn = f'{path}/{src_data["img_path"]}'
+        target_fn = f'{path}/{target_data["img_path"]}'
         source_bbox = np.asarray(src_data['bbox'])
         target_bbox = np.asarray(target_data['bbox'])
 
