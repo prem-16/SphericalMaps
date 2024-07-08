@@ -1,7 +1,7 @@
 #!/bin/bash
 #PBS -N Spherical_maps_Spair
 #PBS -S /bin/bash
-#PBS -l hostlist=^dicky,nodes=1:ppn=16:gpus=1,mem=20gb,walltime=24:00:00
+#PBS -l hostlist=^dicky,nodes=1:ppn=4:gpus=1,mem=20gb,walltime=24:00:00
 #PBS -q student
 #PBS -m a
 #PBS -M srinivap@informatik.uni-freiburg.de

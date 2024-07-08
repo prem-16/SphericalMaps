@@ -3,7 +3,7 @@ data:
   data_path: '/misc/lmbraid21/jesslen/Premnath/dataset/animal3d'
   im_size: [448,448]
   n_cats: 40
-  vp_bins: 8
+  vp_bins: 360
 
 training:
   device: 0
