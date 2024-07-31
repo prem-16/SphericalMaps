@@ -19,7 +19,7 @@ from utils.logger import get_logger
 from loguru import logger
 import argparse
 from extractor_dino import ViTExtractor
-from extractor_sd import load_model, process_features_and_mask, get_mask
+#from extractor_sd import load_model, process_features_and_mask, get_mask
 import itertools
 sys.path.append('../corresp')
 from dino_mapper import DINOMapper
@@ -338,8 +338,9 @@ def compute_score(model, extractor, aug, save_path, files, kps, category, mask=F
         with torch.no_grad():
             if not CO_PCA:
                 if not ONLY_DINO:
-                    img1_desc = process_features_and_mask(model, aug, img1_input, input_text=input_text, mask=False).reshape(1,1,-1, num_patches**2).permute(0,1,3,2)
-                    img2_desc = process_features_and_mask(model, aug, img2_input, category, input_text=input_text,  mask=mask).reshape(1,1,-1, num_patches**2).permute(0,1,3,2)
+                    pass
+                    #img1_desc = process_features_and_mask(model, aug, img1_input, input_text=input_text, mask=False).reshape(1,1,-1, num_patches**2).permute(0,1,3,2)
+                   # img2_desc = process_features_and_mask(model, aug, img2_input, category, input_text=input_text,  mask=mask).reshape(1,1,-1, num_patches**2).permute(0,1,3,2)
                 if FUSE_DINO:
                     img1_batch = extractor.preprocess_pil(img1)
                     img1_desc_dino = extractor.extract_descriptors(img1_batch.to(device), layer, facet)
@@ -348,31 +349,32 @@ def compute_score(model, extractor, aug, save_path, files, kps, category, mask=F
 
             else:
                 if not ONLY_DINO:
-                    features1 = process_features_and_mask(model, aug, img1_input, input_text=input_text,  mask=False, raw=True)
-                    features2 = process_features_and_mask(model, aug, img2_input, input_text=input_text,  mask=False, raw=True)
-                    if not RAW:
-                        processed_features1, processed_features2 = co_pca(features1, features2, PCA_DIMS)
-                    else:
-                        if WEIGHT[0]:
-                            processed_features1 = features1['s5']
-                            processed_features2 = features2['s5']
-                        elif WEIGHT[1]:
-                            processed_features1 = features1['s4']
-                            processed_features2 = features2['s4']
-                        elif WEIGHT[2]:
-                            processed_features1 = features1['s3']
-                            processed_features2 = features2['s3']
-                        elif WEIGHT[3]:
-                            processed_features1 = features1['s2']
-                            processed_features2 = features2['s2']
-                        else:
-                            raise NotImplementedError
-                        # rescale the features
-                        processed_features1 = F.interpolate(processed_features1, size=(num_patches, num_patches), mode='bilinear', align_corners=False)
-                        processed_features2 = F.interpolate(processed_features2, size=(num_patches, num_patches), mode='bilinear', align_corners=False)
+                    pass
+                #   #  features1 = process_features_and_mask(model, aug, img1_input, input_text=input_text,  mask=False, raw=True)
+                #   #  features2 = process_features_and_mask(model, aug, img2_input, input_text=input_text,  mask=False, raw=True)
+                #     if not RAW:
+                #         processed_features1, processed_features2 = co_pca(features1, features2, PCA_DIMS)
+                #     else:
+                #         if WEIGHT[0]:
+                #             processed_features1 = features1['s5']
+                #             processed_features2 = features2['s5']
+                #         elif WEIGHT[1]:
+                #             processed_features1 = features1['s4']
+                #             processed_features2 = features2['s4']
+                #         elif WEIGHT[2]:
+                #             processed_features1 = features1['s3']
+                #             processed_features2 = features2['s3']
+                #         elif WEIGHT[3]:
+                #             processed_features1 = features1['s2']
+                #             processed_features2 = features2['s2']
+                #         else:
+                #             raise NotImplementedError
+                #         # rescale the features
+                #         processed_features1 = F.interpolate(processed_features1, size=(num_patches, num_patches), mode='bilinear', align_corners=False)
+                #         processed_features2 = F.interpolate(processed_features2, size=(num_patches, num_patches), mode='bilinear', align_corners=False)
 
-                    img1_desc = processed_features1.reshape(1, 1, -1, num_patches**2).permute(0,1,3,2)
-                    img2_desc = processed_features2.reshape(1, 1, -1, num_patches**2).permute(0,1,3,2)
+                #     img1_desc = processed_features1.reshape(1, 1, -1, num_patches**2).permute(0,1,3,2)
+                #     img2_desc = processed_features2.reshape(1, 1, -1, num_patches**2).permute(0,1,3,2)
                 if FUSE_DINO:
                     img1_batch = extractor.preprocess_pil(img1)
                     img1_desc_dino = extractor.extract_descriptors(img1_batch.to(device), layer, facet)
@@ -434,8 +436,8 @@ def compute_score(model, extractor, aug, save_path, files, kps, category, mask=F
 
 
             if DRAW_DENSE:
-                mask1 = get_mask(model, aug, img1, category)
-                mask2 = get_mask(model, aug, img2, category)
+                #mask1 = get_mask(model, aug, img1, category)
+                #mask2 = get_mask(model, aug, img2, category)
 
                 if ONLY_DINO or not FUSE_DINO:
                     img1_desc = img1_desc / img1_desc.norm(dim=-1, keepdim=True)
@@ -457,8 +459,9 @@ def compute_score(model, extractor, aug, save_path, files, kps, category, mask=F
             
             if DRAW_SWAP:
                 if not DRAW_DENSE:
-                    mask1 = get_mask(model, aug, img1, category)
-                    mask2 = get_mask(model, aug, img2, category)
+                    pass
+                 #   mask1 = get_mask(model, aug, img1, category)
+                 #   mask2 = get_mask(model, aug, img2, category)
 
                 if ONLY_DINO or not FUSE_DINO:
                     img1_desc = img1_desc / img1_desc.norm(dim=-1, keepdim=True)
@@ -479,13 +482,14 @@ def compute_score(model, extractor, aug, save_path, files, kps, category, mask=F
                     plt.close(fig_colormap)
 
         if MASK and CO_PCA:
-            mask2 = get_mask(model, aug, img2, category)
-            img2_desc = img2_desc.permute(0,1,3,2).reshape(-1, img2_desc.shape[-1], num_patches, num_patches)
-            resized_mask2 = F.interpolate(mask2.cuda().unsqueeze(0).unsqueeze(0).float(), size=(num_patches, num_patches), mode='nearest')
-            img2_desc = img2_desc * resized_mask2.repeat(1, img2_desc.shape[1], 1, 1)
-            img2_desc[(img2_desc.sum(dim=1)==0).repeat(1, img2_desc.shape[1], 1, 1)] = 100000
-            # reshape back
-            img2_desc = img2_desc.reshape(1, 1, img2_desc.shape[1], num_patches*num_patches).permute(0,1,3,2)
+            pass
+           # mask2 = get_mask(model, aug, img2, category)
+            # img2_desc = img2_desc.permute(0,1,3,2).reshape(-1, img2_desc.shape[-1], num_patches, num_patches)
+            # resized_mask2 = F.interpolate(mask2.cuda().unsqueeze(0).unsqueeze(0).float(), size=(num_patches, num_patches), mode='nearest')
+            # img2_desc = img2_desc * resized_mask2.repeat(1, img2_desc.shape[1], 1, 1)
+            # img2_desc[(img2_desc.sum(dim=1)==0).repeat(1, img2_desc.shape[1], 1, 1)] = 100000
+            # # reshape back
+            # img2_desc = img2_desc.reshape(1, 1, img2_desc.shape[1], num_patches*num_patches).permute(0,1,3,2)
 
         # Get mutual visibility
         vis = img1_kps[:, 2] > 0  if metric == 'mAP' else img1_kps[:, 2] * img2_kps[:, 2] > 0
@@ -526,9 +530,10 @@ def compute_score(model, extractor, aug, save_path, files, kps, category, mask=F
             sim_1_to_2 = mixing_ratio * sim_1_to_2 + (1 - mixing_ratio) * sim_1_to_2_sph
 
         if mask_taget:
-            target_mask = torch.tensor(np.asarray(mask2)).to(sim_1_to_2.device).unsqueeze(0).unsqueeze(0)
-            target_mask = F.interpolate(target_mask, (num_patches, num_patches)).view(-1, num_patches**2) > 0
-            sim_1_to_2 = sim_1_to_2.where(target_mask, -torch.ones_like(sim_1_to_2))
+            pass
+            # target_mask = torch.tensor(np.asarray(mask2)).to(sim_1_to_2.device).unsqueeze(0).unsqueeze(0)
+            # target_mask = F.interpolate(target_mask, (num_patches, num_patches)).view(-1, num_patches**2) > 0
+            # sim_1_to_2 = sim_1_to_2.where(target_mask, -torch.ones_like(sim_1_to_2))
 
         if metric == 'PCK':
             # Get nearest neighors
@@ -702,7 +707,8 @@ def main(args):
     torch.cuda.manual_seed(args.SEED)
     torch.backends.cudnn.benchmark = True
     if not ONLY_DINO:
-        model, aug = load_model(diffusion_ver=VER, image_size=SIZE, num_timesteps=args.TIMESTEP, block_indices=tuple(INDICES))
+        pass
+        #model, aug = load_model(diffusion_ver=VER, image_size=SIZE, num_timesteps=args.TIMESTEP, block_indices=tuple(INDICES))
     else:
         model, aug = None, None
     save_path=f'./results_spair/pck_fuse_{args.NOTE}{metric}_sph_{SPH}_mask_{MASK}_sample_{SAMPLE}_BBOX_{BBOX_THRE}_dist_{DIST}_Invis_{COUNT_INVIS}_{args.TIMESTEP}{VER}_{MODEL_SIZE}_{SIZE}_copca_{CO_PCA}_{INDICES[0]}_{PCA_DIMS[0]}_{INDICES[1]}_{PCA_DIMS[1]}_{INDICES[2]}_{PCA_DIMS[2]}_text_{TEXT_INPUT}_sd_{WEIGHT[3]}{not ONLY_DINO}_dino_{WEIGHT[4]}{FUSE_DINO}'

@@ -50,7 +50,7 @@ MAP_ANIMAL3D_WNID = {
     "ram": "n02412080",
     "bison": "n02415577",
     "ox": "n02417914",
-    "hartebeest": "n02422106",
+   # "hartebeest": "n02422106",
     "impala": "n02422699",
     "gazelle": "n02423022",
     "bighorn": "n02412080"

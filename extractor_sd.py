@@ -1,20 +1,20 @@
 import itertools
 from contextlib import ExitStack
 import torch
-from mask2former.data.datasets.register_ade20k_panoptic import ADE20K_150_CATEGORIES
+#from mask2former.data.datasets.register_ade20k_panoptic import ADE20K_150_CATEGORIES
 from PIL import Image
 import numpy as np
 import torch.nn.functional as F
-from detectron2.config import instantiate
-from detectron2.data import MetadataCatalog
-from detectron2.data import detection_utils as utils
-from detectron2.config import LazyCall as L
-from detectron2.data import transforms as T
-from detectron2.data.datasets.builtin_meta import COCO_CATEGORIES
-from detectron2.evaluation import inference_context
-from detectron2.utils.env import seed_all_rng
-from detectron2.utils.visualizer import ColorMode, Visualizer, random_color
-from detectron2.utils.logger import setup_logger
+# from detectron2.config import instantiate
+# from detectron2.data import MetadataCatalog
+# from detectron2.data import detection_utils as utils
+# from detectron2.config import LazyCall as L
+# from detectron2.data import transforms as T
+# from detectron2.data.datasets.builtin_meta import COCO_CATEGORIES
+# from detectron2.evaluation import inference_context
+# from detectron2.utils.env import seed_all_rng
+# from detectron2.utils.visualizer import ColorMode, Visualizer, random_color
+# from detectron2.utils.logger import setup_logger
 
 from odise import model_zoo
 from odise.checkpoint import ODISECheckpointer
