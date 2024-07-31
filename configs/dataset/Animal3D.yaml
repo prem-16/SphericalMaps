@@ -24,5 +24,6 @@ model:
 
 logs:
   enabled: True
+  wandb: True
   base_dir: '/misc/lmbraid21/jesslen/Premnath/exps_smap/'
   save_frequency: 10
